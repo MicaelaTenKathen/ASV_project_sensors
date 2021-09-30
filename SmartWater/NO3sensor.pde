@@ -38,7 +38,7 @@ socket2Class NO3Sensor;
 #define point2 100.0
 #define point3 1000.0
 
-// Calibration Voltage values
+// Calibration Voltage values (29/09/21)
 #define point1_volt_NO3 3.22
 #define point2_volt_NO3 3.45
 #define point3_volt_NO3 3.31
