@@ -36,7 +36,7 @@ socket1Class NH4Sensor;
 #define point2 20.0
 #define point3 40.0
 
-// Calibration Voltage values
+// Calibration Voltage values (29/09/21)
 #define point1_volt_NH4 2.61
 #define point2_volt_NH4 2.82
 #define point3_volt_NH4 2.90
