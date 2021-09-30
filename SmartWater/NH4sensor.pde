@@ -19,7 +19,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
- *  Design:            José Miguel Córdoba Méndez
+*/  Design:            José Miguel Córdoba Méndez
 
 // Put your libraries here (#include ...)
 
