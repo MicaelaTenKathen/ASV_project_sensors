@@ -13,30 +13,44 @@ def comparison(data, i, num_points):
         ax.set_xlabel("Punto de muestreo")
         ax.set_ylabel("ºC")
 
-    elif i == 1:
-        fig, ax = plt.subplots(1, 1, figsize=(8, 4))
-        fig.suptitle("pH")
-        ax.bar(x, data["MEAN"], width, color='c', yerr=data["STD"], label='pH', alpha=0.9)
-        ax.set_xlabel("Punto de muestreo")
-        ax.set_ylabel("mV")
+    # elif i == 1:
+    #     fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+    #     fig.suptitle("pH")
+    #     ax.bar(x, data["MEAN"], width, color='c', yerr=data["STD"], label='pH', alpha=0.9)
+    #     ax.set_xlabel("Punto de muestreo")
+    #     ax.set_ylabel("mV")
+    #
+    # elif i == 2:
+    #     fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+    #     fig.suptitle("DO")
+    #     ax.bar(x, data["MEAN"], width, color='y', yerr=data["STD"], label='DO', alpha=0.7)
+    #     ax.set_xlabel("Punto de muestreo")
+    #     ax.set_ylabel("%")
+    #
+    # elif i == 3:
+    #     fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+    #     fig.suptitle("Conductividad")
+    #     ax.bar(x, data["MEAN"], width, color='r', yerr=data["STD"], label='Conductividad', alpha=0.6)
+    #     ax.set_xlabel("Punto de muestreo")
+    #     ax.set_ylabel("us/cm")
+    #
+    # elif i == 4:
+    #     fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+    #     fig.suptitle("ORP")
+    #     ax.bar(x, data["MEAN"], width, color='g', yerr=data["STD"], label='ORP', alpha=0.7)
+    #     ax.set_xlabel("Punto de muestreo")
+    #     ax.set_ylabel("mV")
 
-    elif i == 2:
+    elif i == 5:
         fig, ax = plt.subplots(1, 1, figsize=(8, 4))
-        fig.suptitle("DO")
-        ax.bar(x, data["MEAN"], width, color='y', yerr=data["STD"], label='DO', alpha=0.7)
+        fig.suptitle("Nitrato Disuelto")
+        ax.bar(x, data["MEAN"], width, color='m', yerr=data["STD"], label='Nitrato Disuelto', alpha=0.7)
         ax.set_xlabel("Punto de muestreo")
-        ax.set_ylabel("%")
+        ax.set_ylabel("ppm")
 
-    elif i == 3:
+    elif i == 6:
         fig, ax = plt.subplots(1, 1, figsize=(8, 4))
-        fig.suptitle("Conductividad")
-        ax.bar(x, data["MEAN"], width, color='r', yerr=data["STD"], label='Conductividad', alpha=0.6)
+        fig.suptitle("Amonio Disuelto")
+        ax.bar(x, data["MEAN"], width, color='k', yerr=data["STD"], label='Amonio Disuelto', alpha=0.5)
         ax.set_xlabel("Punto de muestreo")
-        ax.set_ylabel("us/cm")
-
-    elif i == 4:
-        fig, ax = plt.subplots(1, 1, figsize=(8, 4))
-        fig.suptitle("ORP")
-        ax.bar(x, data["MEAN"], width, color='g', yerr=data["STD"], label='ORP', alpha=0.7)
-        ax.set_xlabel("Punto de muestreo")
-        ax.set_ylabel("mV")
+        ax.set_ylabel("ppm")

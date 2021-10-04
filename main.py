@@ -14,17 +14,17 @@ total_sample = np.copy(total_data["SAMPLE_NUM"])
 
 last_data = 0
 init = 0
-num_points = 20
+num_points = 1
 
 time = False
 cond = True
 
 data1 = np.copy(total_data["DATE"])
 n_data = np.arange(1, num_points + 1, 1)
-sensors = ["TEMP", "PH", "DO", "COND", "ORP"]  # , "BAT"]
-name_sensors = ['temp%s', 'ph%s', 'do%s', 'cond%s', 'orp%s']  # , 'bat%s']
-mean_sensors = ['mean_temp%s', 'mean_ph%s', 'mean_do%s', 'mean_cond%s', 'mean_orp%s']  # , 'mean_bat%s']
-std_sensors = ['std_temp%s', 'std_ph%s', 'std_do%s', 'std_cond%s', 'std_orp%s']  # , 'std_bat%s']
+sensors = ["TEMP", "PH", "DO", "COND", "ORP", "SWINO3", "SWINH4"]  # , "BAT"]
+name_sensors = ['temp%s', 'ph%s', 'do%s', 'cond%s', 'orp%s', 'no3%s', 'nh4%s']  # , 'bat%s']
+mean_sensors = ['mean_temp%s', 'mean_ph%s', 'mean_do%s', 'mean_cond%s', 'mean_orp%s', 'mean_no3%s', 'mean_nh4%a']  # , 'mean_bat%s']
+std_sensors = ['std_temp%s', 'std_ph%s', 'std_do%s', 'std_cond%s', 'std_orp%s', 'std_no3%s', 'std_nh4%s']  # , 'std_bat%s']
 
 if time:
     for k in range(len(sensors)):
@@ -73,7 +73,9 @@ while r < m:
                                                 "PH": globals()[name_sensors[1] % n_data[r]],
                                                 "DO": globals()[name_sensors[2] % n_data[r]],
                                                 "COND": globals()[name_sensors[3] % n_data[r]],
-                                                "ORP": globals()[name_sensors[4] % n_data[r]]}
+                                                "ORP": globals()[name_sensors[4] % n_data[r]],
+                                                "SWINO3": globals()[name_sensors[5] % n_data[r]],
+                                                "SWINH4": globals()[name_sensors[6] % n_data[r]]}
     # "BAT": globals()[name_sensors[5] % n_data[j]]
 
     globals()['time%s' % n_data[r]] = np.arange(0, np.array(globals()[name_sensors[0] % n_data[r]]).shape[0], 1) * 13
@@ -108,7 +110,8 @@ total_sample = {"TEMP": globals()['total%s' % sensors[0]],
                 "PH": globals()['total%s' % sensors[1]],
                 "DO": globals()['total%s' % sensors[2]],
                 "COND": globals()['total%s' % sensors[3]],
-                "ORP": globals()['total%s' % sensors[4]]}
+                "ORP": globals()['total%s' % sensors[4]],
+                }
 
 histo(total_sample, 1, min_sensors, max_sensors, shape_sensors)
 

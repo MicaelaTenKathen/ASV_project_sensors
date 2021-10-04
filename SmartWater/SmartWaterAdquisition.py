@@ -138,8 +138,8 @@ class WaterQualityModule():
 if __name__ == '__main__':
     smart_water = WaterQualityModule(USB_string='COM8', timeout=6, baudrate=115200)
 
-    num_of_samples = 150
+    num_of_samples = 80
 
     datos = smart_water.take_a_sample(num_of_samples=num_of_samples)
 
-    datos.to_csv('./data30-09.csv')
+    datos.to_csv('./datapoint4(0110).csv')
