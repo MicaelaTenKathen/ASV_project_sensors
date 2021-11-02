@@ -1,45 +1,48 @@
 import pandas as pd
-from Data_scripts.data_collected_time import data_collec
-from Data_scripts.data_collected_cond import data_collec_cond
+from Data_scripts.data_collected import Data_collected
 from Data_scripts.limits import *
 from Data_scripts.mean_std import mean
 from Data_scripts.normalize import *
 from Plots.sensors import comparison
 from Plots.plot import *
 
-total_data = pd.read_csv("Data/data_11_06_2021_v2.csv", delimiter=",")
+total_data = pd.read_csv("Data/data_point22_10 (version 1).csv", delimiter=",")
 
-total_data["DATE"] = pd.to_datetime(total_data["DATE"])
+total_data["DATE"] = pd.to_datetime(total_data["Fecha"])
 total_sample = np.copy(total_data["SAMPLE_NUM"])
 
 last_data = 0
-init = 0
-num_points = 1
+initial = 0
+num_points = 30
 
 time = False
-cond = True
+cond = False
+no3 = True
 
 data1 = np.copy(total_data["DATE"])
 n_data = np.arange(1, num_points + 1, 1)
-sensors = ["TEMP", "PH", "DO", "COND", "ORP", "SWINO3", "SWINH4"]  # , "BAT"]
-name_sensors = ['temp%s', 'ph%s', 'do%s', 'cond%s', 'orp%s', 'no3%s', 'nh4%s']  # , 'bat%s']
-mean_sensors = ['mean_temp%s', 'mean_ph%s', 'mean_do%s', 'mean_cond%s', 'mean_orp%s', 'mean_no3%s', 'mean_nh4%a']  # , 'mean_bat%s']
-std_sensors = ['std_temp%s', 'std_ph%s', 'std_do%s', 'std_cond%s', 'std_orp%s', 'std_no3%s', 'std_nh4%s']  # , 'std_bat%s']
+# sensors = ["TEMP", "PH", "DO", "COND", "ORP", "SWINO3", "SWINH4"]  # , "BAT"]
+sensors = ["Temperatura", "Ph", "Oxigeno Disuelto", "Conductividad", "OxRed", "Nitrato Disuelto",
+           "Amonio disuelto"]
+name_sensors = ['temp%s', 'ph%s', 'do%s', 'cond%s', 'orp%s', 'no3_%s', 'nh4_%s']  # , 'bat%s']
+mean_sensors = ['mean_temp%s', 'mean_ph%s', 'mean_do%s', 'mean_cond%s', 'mean_orp%s', 'mean_no3_%s', 'mean_nh4_%a']  # , 'mean_bat%s']
+std_sensors = ['std_temp%s', 'std_ph%s', 'std_do%s', 'std_cond%s', 'std_orp%s', 'std_no_3%s', 'std_nh4_%s']  # , 'std_bat%s']
 
+data_col = Data_collected(total_data, sensors)
 if time:
     for k in range(len(sensors)):
-        init = 0
+        initial = 0
         for j in range(len(n_data)):
-            globals()[name_sensors[k] % n_data[j]], init = data_collec(total_data, init, sensors, k)
+            globals()[name_sensors[k] % n_data[j]], initial = data_col.data_collec(k, initial)
             m = j
 elif cond:
     for k in range(len(sensors)):
-        init = 0
+        initial = 0
         conf = False
         p = 0
         m = 0
         for j in range(len(n_data)):
-            data_con, init, conf = data_collec_cond(total_data, init, sensors, k, conf)
+            data_con, conf, initial = data_col.data_collec_cond(initial, k, conf)
             if conf:
                 if p != 3:
                     if k == 4:
@@ -51,6 +54,20 @@ elif cond:
                 else:
                     p += 1
                     conf = False
+elif no3:
+    for k in range(len(sensors)):
+        initial = 0
+        conf = False
+        m = 0
+        for j in range(len(n_data)):
+            data_con, conf, initial = data_col.data_collec_no3(initial, k, conf)
+            if conf:
+                if conf:
+                    globals()[name_sensors[k] % n_data[m]] = np.copy(data_con)
+                    m += 1
+                    conf = False
+                else:
+                    conf = False
 
 d = 0
 
@@ -58,9 +75,9 @@ for k in range(len(sensors)):
     d = 0
     r = 0
     data_l = list()
-    while d < 3:
-        globals()[name_sensors[k] % n_data[3]] = np.delete(globals()[name_sensors[k] % n_data[3]], - 1)
-        d += 1
+    #while d < 3:
+     #   globals()[name_sensors[k] % n_data[3]] = np.delete(globals()[name_sensors[k] % n_data[3]], - 1)
+      #  d += 1
     while r < m:
         data_l.extend(globals()[name_sensors[k] % n_data[r]])
         r += 1
@@ -69,13 +86,13 @@ for k in range(len(sensors)):
 r = 0
 while r < m:
 
-    globals()['sample_points%s' % n_data[r]] = {"TEMP": globals()[name_sensors[0] % n_data[r]],
-                                                "PH": globals()[name_sensors[1] % n_data[r]],
-                                                "DO": globals()[name_sensors[2] % n_data[r]],
-                                                "COND": globals()[name_sensors[3] % n_data[r]],
-                                                "ORP": globals()[name_sensors[4] % n_data[r]],
-                                                "SWINO3": globals()[name_sensors[5] % n_data[r]],
-                                                "SWINH4": globals()[name_sensors[6] % n_data[r]]}
+    globals()['sample_points%s' % n_data[r]] = {"Temperatura": globals()[name_sensors[0] % n_data[r]],
+                                                "Ph": globals()[name_sensors[1] % n_data[r]],
+                                                "Oxigeno Disuelto": globals()[name_sensors[2] % n_data[r]],
+                                                "Conductividad": globals()[name_sensors[3] % n_data[r]],
+                                                "OxRed": globals()[name_sensors[4] % n_data[r]],
+                                                "Nitrato Disuelto": globals()[name_sensors[5] % n_data[r]],
+                                                "Amonio disuelto": globals()[name_sensors[6] % n_data[r]]}
     # "BAT": globals()[name_sensors[5] % n_data[j]]
 
     globals()['time%s' % n_data[r]] = np.arange(0, np.array(globals()[name_sensors[0] % n_data[r]]).shape[0], 1) * 13
@@ -106,11 +123,13 @@ while r < m:
     histo(globals()['sample_points%s' % n_data[r]], n_data[r], min_sensors, max_sensors, shape_sensors)
     r += 1
 
-total_sample = {"TEMP": globals()['total%s' % sensors[0]],
-                "PH": globals()['total%s' % sensors[1]],
-                "DO": globals()['total%s' % sensors[2]],
-                "COND": globals()['total%s' % sensors[3]],
-                "ORP": globals()['total%s' % sensors[4]],
+total_sample = {"Temperatura": globals()['total%s' % sensors[0]],
+                "Ph": globals()['total%s' % sensors[1]],
+                "Oxigeno Disuelto": globals()['total%s' % sensors[2]],
+                "Conductividad": globals()['total%s' % sensors[3]],
+                "OxRed": globals()['total%s' % sensors[4]],
+                "Nitrato Disuelto": globals()['total%s' % sensors[5]],
+                "Amonio disuelto": globals()['total%s' % sensors[6]]
                 }
 
 histo(total_sample, 1, min_sensors, max_sensors, shape_sensors)

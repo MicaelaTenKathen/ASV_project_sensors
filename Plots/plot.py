@@ -6,7 +6,7 @@ plt.style.use("seaborn")
 
 def plots(data, time, nu, min_sensors, max_sensors):
 
-    num = nu + 1
+    num = nu
 
     plt.figure(figsize=(8, 10))
     plt.suptitle("Punto de muestreo %i" % num)
@@ -61,7 +61,7 @@ def plots(data, time, nu, min_sensors, max_sensors):
 
 def histo(data, nu, min_sensors, max_sensors, shape_sensors):
     stable_data = data
-    num = nu + 1
+    num = nu
     if num == 1:
         sa = 4
     else:

@@ -22,7 +22,7 @@ where ```C:\fso\UsersConsolidated.csv``` corresponds to the path of the csv file
 
 For more information, go to [this link](https://devblogs.microsoft.com/scripting/remove-unwanted-quotation-marks-from-csv-files-by-using-powershell/)
 
-The [main](main.py) file contains the main part of the code. Running this script will generate the graphs.
+The [main](SWprocessing.py) file contains the main part of the code. Running this script will generate the graphs.
 
 
 On line 7, the file must be selected. Preferably, save the document in the [Data](Data) folder and extract from there.
