@@ -27,74 +27,97 @@
 
 #include <WaspXBeeZB.h>
 #include <WaspFrame.h>
-#include <smartWaterIons.h>
+#include <WaspSensorSW.h>
 
 // Destination MAC address
 //////////////////////////////////////////
-char RX_ADDRESS[] = "0013A20041984654";
+char RX_ADDRESS[] = "0013A20041DC3580";
 //////////////////////////////////////////
 
 // Define the Waspmote ID
-char WASPMOTE_ID[] = "SW3";
+char WASPMOTE_ID[] = "SW2";
+char node_ID[] = "Temperature_example";
 
 
 // define variable
 uint8_t error;
 
+//Temperature Sensor
 float temp;
-
 pt1000Class TemperatureSensor;
 
-float no3;
-float nh4;
+//pH Sensor
+float pHVol;
+float pHValue;
 
-socket1Class NH4Sensor;
+#define cal_point_10  1.980
+#define cal_point_7   2.090
+#define cal_point_4   2.251
 
-// Calibration concentrations solutions used in the process
-#define point1_NH4 4.0
-#define point2_NH4 20.0
-#define point3_NH4 40.0
+#define cal_temp 20.1
 
-// Calibration Voltage values
-#define point1_volt_NH4 2.61
-#define point2_volt_NH4 2.82
-#define point3_volt_NH4 2.90
+pHClass pHSensor;
 
-// Define the number of calibration points
-#define numPoints 3
+//DO Sensor
 
-float calConcentrations_NH4[] = {point1_NH4, point2_NH4, point3_NH4};
-float calVoltages_NH4[] = {point1_volt_NH4, point2_volt_NH4, point3_volt_NH4}; 
+float DOVol;
+float DOValue;
 
-socket2Class NO3Sensor;
+// Calibration of the sensor in normal air
+#define air_calibration 3.55
+// Calibration of the sensor under 0% solution
+#define zero_calibration 0.203
 
-#define point1_NO3 10.0
-#define point2_NO3 100.0
-#define point3_NO3 1000.0
+DOClass DOSensor;
 
-// Calibration Voltage values
-#define point1_volt_NO3 3.22
-#define point2_volt_NO3 3.45
-#define point3_volt_NO3 3.31
+//Conductivity Sensor
 
-// Define the number of calibration points
-#define numPoints 3
+float ECRes;
+float ECValue;
 
-float calConcentrations_NO3[] = {point1_NO3, point2_NO3, point3_NO3};
-float calVoltages_NO3[] = {point1_volt_NO3, point2_volt_NO3, point3_volt_NO3}; 
+// Value 1 used to calibrate the sensor
+#define point1_cond 84
+// Value 2 used to calibrate the sensor
+#define point2_cond 1413
 
+// Point 1 of the calibration 
+#define point1_cal 12964
+// Point 2 of the calibration 
+#define point2_cal 871
+
+conductivityClass ConductivitySensor;
+
+//ORP Sensor
+
+float ORPValue;
+
+// Offset obtained from sensor calibration
+#define calibration_offset 0.019
+
+ORPClass ORPSensor;
+
+
+/*******************************************
+ *
+ *  checkNetworkParams - Check operating
+ *  network parameters in the XBee module
+ *
+ *******************************************/
 void checkNetworkParams()
 {
+  // 1. get operating 64-b PAN ID
   xbeeZB.getOperating64PAN();
+
+  // 2. wait for association indication
   xbeeZB.getAssociationIndication();
-
+ 
   while( xbeeZB.associationIndication != 0 )
-  {
-    delay(2000);
-
+  { 
+    delay(500);
+    
+    // get operating 64-b PAN ID
     xbeeZB.getOperating64PAN();
 
-    USB.print(F("operating 64-b PAN ID:"));
     USB.printHex(xbeeZB.operating64PAN[0]);
     USB.printHex(xbeeZB.operating64PAN[1]);
     USB.printHex(xbeeZB.operating64PAN[2]);
@@ -103,22 +126,20 @@ void checkNetworkParams()
     USB.printHex(xbeeZB.operating64PAN[5]);
     USB.printHex(xbeeZB.operating64PAN[6]);
     USB.printHex(xbeeZB.operating64PAN[7]);
-    USB.println();
-
+    USB.println();     
+    
     xbeeZB.getAssociationIndication();
   }
-  USB.println(F("\nJoined a network"));
-  
+
+
+  // 3. get network parameters 
   xbeeZB.getOperating16PAN();
   xbeeZB.getOperating64PAN();
   xbeeZB.getChannel();
 
-  USB.print(F("operating 16-b PAN ID:"));
   USB.printHex(xbeeZB.operating16PAN[0]);
   USB.printHex(xbeeZB.operating16PAN[1]);
-  USB.println();
-  
-  USB.print(F("operating 64-b PAN ID:"));
+
   USB.printHex(xbeeZB.operating64PAN[0]);
   USB.printHex(xbeeZB.operating64PAN[1]);
   USB.printHex(xbeeZB.operating64PAN[2]);
@@ -129,9 +150,6 @@ void checkNetworkParams()
   USB.printHex(xbeeZB.operating64PAN[7]);
   USB.println();
 
-  USB.print(F("channel: "));
-  USB.printHex(xbeeZB.channel);
-  USB.println();
 }
 
 void setup()
@@ -142,15 +160,17 @@ void setup()
   
   // store Waspmote identifier in EEPROM memory
   frame.setID( WASPMOTE_ID );
-  SWIonsBoard.ON();
 
-  NH4Sensor.setCalibrationPoints(calVoltages_NH4, calConcentrations_NH4, numPoints);
-  NO3Sensor.setCalibrationPoints(calVoltages_NO3, calConcentrations_NO3, numPoints);
+  Water.ON();
+
+  pHSensor.setCalibrationPoints(cal_point_10, cal_point_7, cal_point_4, cal_temp);
+  DOSensor.setCalibrationPoints(air_calibration, zero_calibration);
+  ConductivitySensor.setCalibrationPoints(point1_cond, point1_cal, point2_cond, point2_cal);
   
   // init XBee
   xbeeZB.ON();
   
-  delay(3000);
+  delay(500);
   
   //////////////////////////
   // 2. check XBee's network parameters
@@ -169,25 +189,37 @@ void loop()
   // create new frame
   frame.createFrame(ASCII);  
 
-  temp = TemperatureSensor.read();
+  temp = TemperatureSensor.readTemperature();
 
-  float NH4Voltage = NH4Sensor.read();
-  float NH4concentration = NH4Sensor.calculateConcentration(NH4Voltage);
+ // Read the ph sensor (voltage value)
+  pHVol = pHSensor.readpH();
+  // Convert the value read with the information obtained in calibration
+  pHValue = pHSensor.pHConversion(pHVol, temp);
 
-  float NO3Voltage = NO3Sensor.read();
-  float NO3concentration = NO3Sensor.calculateConcentration(NO3Voltage);
-  
-  // add frame fields
+    // Reading of the ORP sensor
+  DOVol = DOSensor.readDO();
+  // Conversion from volts into dissolved oxygen percentage
+  DOValue = DOSensor.DOConversion(DOVol);
 
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel()); 
+  ECRes = ConductivitySensor.readConductivity();
+  // Conversion from resistance into us/cm
+  ECValue = ConductivitySensor.conductivityConversion(ECRes);
+
+  // Reading of the ORP sensor
+  ORPValue = ORPSensor.readORP();
+  // Apply the calibration offset
+  ORPValue = ORPValue - calibration_offset;
+
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   frame.addSensor(SENSOR_WATER_WT, temp);
-  frame.addSensor(SENSOR_IONS_NH4, NH4concentration);
-  frame.addSensor(SENSOR_IONS_NO3, NO3concentration);
+  frame.addSensor(SENSOR_WATER_PH, pHValue);
+  frame.addSensor(SENSOR_WATER_DO, DOValue);
+  frame.addSensor(SENSOR_WATER_COND, ECValue);
+  frame.addSensor(SENSOR_WATER_ORP, ORPValue);
 
   frame.showFrame();
 
   USB.println(F("Enviando datos sensores"));
-  
 
   ///////////////////////////////////////////
   // 2. Send packet
@@ -214,6 +246,11 @@ void loop()
   }
 
   // wait for five seconds
-  delay(5000);
+  delay(500);
 }
+
+
+
+
+
 
