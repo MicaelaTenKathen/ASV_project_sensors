@@ -37,30 +37,36 @@ class WaterQualityModule():
         nh4_vector = []
 
         # Iterate over the sample_nums
+
         for i in range(num_of_samples):
-            print("Taking sample {} / {}".format(i + 1, num_of_samples))
 
-            self.read_frame()  # Read a frame from the buffer
+            try:
+                print("Taking sample {} / {}".format(i + 1, num_of_samples))
 
-            str_date = str(datetime.now())  # Leemos la fecha y la convertimos en string
-            # Metemos la fecha en el diccionario de variables
-            self.sensor_data['DATE'] = str_date
+                self.read_frame()  # Read a frame from the buffer
 
-            print("Incoming data: ")
-            print(self.sensor_data)
+                str_date = str(datetime.now())  # Leemos la fecha y la convertimos en string
+                # Metemos la fecha en el diccionario de variables
+                self.sensor_data['DATE'] = str_date
 
-            # creamos una tupla de parametros que nos permitira introducir los datos en la tabla sensor
-            #  ['SAMPLE_NUM','BAT','WT','PH','DO','COND','ORP','DATE','SWINO3','SWINH4']
-            sample_num_vector.append(self.sensor_data['SAMPLE_NUM'])
-            bat_vector.append(self.sensor_data['BAT'])
-            wt_vector.append(self.sensor_data['WT'])
-            ph_vector.append(self.sensor_data['PH'])
-            do_vector.append(self.sensor_data['DO'])
-            cond_vector.append(self.sensor_data['COND'])
-            orp_vector.append(self.sensor_data['ORP'])
-            date_vector.append(self.sensor_data['DATE'])
-            no3_vector.append(self.sensor_data['SWINO3'])
-            nh4_vector.append(self.sensor_data['SWINH4'])
+                print("Incoming data: ")
+                print(self.sensor_data)
+
+                # creamos una tupla de parametros que nos permitira introducir los datos en la tabla sensor
+                #  ['SAMPLE_NUM','BAT','WT','PH','DO','COND','ORP','DATE','SWINO3','SWINH4']
+                sample_num_vector.append(self.sensor_data['SAMPLE_NUM'])
+                bat_vector.append(self.sensor_data['BAT'])
+                wt_vector.append(self.sensor_data['WT'])
+                ph_vector.append(self.sensor_data['PH'])
+                do_vector.append(self.sensor_data['DO'])
+                cond_vector.append(self.sensor_data['COND'])
+                orp_vector.append(self.sensor_data['ORP'])
+                date_vector.append(self.sensor_data['DATE'])
+                no3_vector.append(self.sensor_data['SWINO3'])
+                nh4_vector.append(self.sensor_data['SWINH4'])
+
+            except KeyboardInterrupt:
+                break
 
         DF = pd.DataFrame(
             {'SAMPLE_NUM': sample_num_vector,
@@ -136,7 +142,7 @@ class WaterQualityModule():
 
 
 if __name__ == '__main__':
-    smart_water = WaterQualityModule(USB_string='COM5', timeout=6, baudrate=115200)
+    smart_water = WaterQualityModule(USB_string='COM11', timeout=6, baudrate=115200)
 
     num_of_samples = 1000
 
