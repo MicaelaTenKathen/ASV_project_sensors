@@ -1,13 +1,13 @@
 import pandas as pd
-from Data_scripts.data_collected_time import data_collec
-from Data_scripts.data_collected import data_collec_cond
+# from Data_scripts.data_collected_time import data_collec
+# from Data_scripts.data_collected import data_collec_cond
 from Data_scripts.limits import *
 from Data_scripts.mean_std import mean
 from Data_scripts.normalize import *
 from Plots.sensors import comparison
 from Plots.plot import *
 
-total_data1 = pd.read_csv("Data/data_point22_10 (version 1).csv", delimiter=",")
+total_data1 = pd.read_csv("Data/datapoint(170222point1).csv", delimiter=",")
 # total_data2 = pd.read_csv("Data/datapoint2(0110).csv", delimiter=",")
 # total_data3 = pd.read_csv("Data/datapoint3(0110).csv", delimiter=",")
 # total_data4 = pd.read_csv("Data/datapoint4(0110).csv", delimiter=",")
